@@ -33,14 +33,14 @@
         <img src="../uploads/logo.svg" alt="BankoBet">
       </div>
       <nav class="sidebar-nav">
-        <a class="active" onclick="showPage('dashboard')">📊 <span>Dashboard</span></a>
-        <a onclick="showPage('posts')">📝 <span>Yazılar</span></a>
-        <a onclick="showPage('new-post')">➕ <span>Yeni Yazı</span></a>
-        <a onclick="showPage('homepage')">🏠 <span>Ana Sayfa</span></a>
-        <a onclick="showPage('seo')">🔍 <span>SEO Ayarları</span></a>
+        <a class="active" onclick="showPage('dashboard')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> <span>Dashboard</span></a>
+        <a onclick="showPage('posts')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> <span>Yazilar</span></a>
+        <a onclick="showPage('new-post')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span>Yeni Yazi</span></a>
+        <a onclick="showPage('homepage')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> <span>Ana Sayfa</span></a>
+        <a onclick="showPage('seo')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> <span>SEO Ayarlari</span></a>
       </nav>
       <div class="logout-btn">
-        <a onclick="doLogout()">🚪 <span>Çıkış</span></a>
+        <a onclick="doLogout()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> <span>Cikis</span></a>
       </div>
     </aside>
 
@@ -51,7 +51,7 @@
       <div class="page active" id="page-dashboard">
         <div class="topbar">
           <h1>Dashboard</h1>
-          <button class="btn btn-green" onclick="showPage('new-post')">➕ Yeni Yazı</button>
+          <button class="btn btn-green" onclick="showPage('new-post')">+ Yeni Yazi</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
           <div class="card" style="text-align:center">
@@ -77,7 +77,7 @@
       <div class="page" id="page-posts">
         <div class="topbar">
           <h1>Yazılar</h1>
-          <button class="btn btn-green" onclick="showPage('new-post')">➕ Yeni Yazı</button>
+          <button class="btn btn-green" onclick="showPage('new-post')">+ Yeni Yazi</button>
         </div>
         <div class="card">
           <div class="table-wrap">
@@ -132,9 +132,9 @@
                   <button onclick="execCmd('insertOrderedList')" title="Sıralı Liste">1. Liste</button>
                   <button onclick="addHeading('h2')" title="Başlık">H2</button>
                   <button onclick="addHeading('h3')" title="Alt Başlık">H3</button>
-                  <button onclick="addLink()" title="Link">🔗 Link</button>
-                  <button onclick="addImage()" title="Resim">🖼 Resim</button>
-                  <button onclick="execCmd('formatBlock','blockquote')" title="Alıntı">❝ Alıntı</button>
+                  <button onclick="addLink()" title="Link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Link</button>
+                  <button onclick="addImage()" title="Resim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Resim</button>
+                  <button onclick="execCmd('formatBlock','blockquote')" title="Alıntı"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg> Alinti</button>
                 </div>
                 <div class="editor-area" id="post-content" contenteditable="true"></div>
               </div>
@@ -149,7 +149,7 @@
             <div class="card">
               <div class="card-title">Öne Çıkan Görsel</div>
               <div class="img-upload" id="featured-upload" onclick="document.getElementById('file-input').click()">
-                <p>📷 Görsel yüklemek için tıklayın</p>
+                <p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7f8c8d" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gorsel yuklemek icin tiklayin</p>
               </div>
               <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadImage(this)">
               <input type="hidden" id="post-image">
