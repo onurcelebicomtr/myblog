@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   if (document.getElementById('posts-grid')) loadPosts();
+  if (document.getElementById('home-content')) loadSingleContent('homepage', 'home-content');
+  if (document.getElementById('giris-content')) loadSingleContent('giris', 'giris-content');
 });
 
 function loadSettings() {
@@ -61,7 +63,7 @@ function loadSettings() {
 
 function loadPosts() {
   const baseUrl = location.origin;
-  fetch('api/posts.php')
+  fetch('api/posts.php?type=blog')
     .then(r => r.json())
     .then(posts => {
       const grid = document.getElementById('posts-grid');
@@ -75,7 +77,6 @@ function loadPosts() {
             <h3 class="card-title">${p.title}</h3>
             <p class="card-excerpt">${p.excerpt || p.content.replace(/<[^>]*>/g,'').substring(0,120) + '...'}</p>
             <span class="card-date">${new Date(p.created_at).toLocaleDateString('tr-TR')}</span>
-            ${p.reading_time ? `<span class="card-read"> · ${p.reading_time} dk okuma</span>` : ''}
           </div>
         </a>
       `).join('');
@@ -99,6 +100,25 @@ function loadPosts() {
           }))
         });
       }
+    })
+    .catch(() => {});
+}
+
+function loadSingleContent(pageType, containerId) {
+  fetch('api/posts.php?type=' + pageType)
+    .then(r => r.json())
+    .then(posts => {
+      const container = document.getElementById(containerId);
+      const empty = document.getElementById('empty-state');
+      if (!posts.length) { if (empty) empty.style.display = 'block'; return; }
+      const p = posts[0];
+      container.innerHTML = `
+        <article>
+          ${p.featured_image ? `<img style="width:100%;border-radius:12px;margin-bottom:24px;max-height:400px;object-fit:cover" src="${p.featured_image}" alt="${p.title}" loading="lazy">` : ''}
+          <h2 style="font-family:var(--font-heading);font-size:26px;font-weight:700;color:var(--navy);margin-bottom:16px">${p.title}</h2>
+          <div style="font-size:17px;line-height:1.9;color:var(--text)">${p.content}</div>
+        </article>
+      `;
     })
     .catch(() => {});
 }

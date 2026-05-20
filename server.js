@@ -123,6 +123,8 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify(post || { error: 'Yazı bulunamadı' }));
       } else {
         if (!url.searchParams.has('all')) posts = posts.filter(p => p.status === 'published');
+        const typeFilter = url.searchParams.get('type');
+        if (typeFilter) posts = posts.filter(p => (p.page_type || 'blog') === typeFilter);
         posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(posts));
@@ -149,6 +151,7 @@ const server = http.createServer(async (req, res) => {
         category: input.category || '', author: input.author || 'BankoBet',
         focus_keyword: input.focus_keyword || '', canonical: input.canonical || '',
         robots_meta: input.robots_meta || 'index, follow',
+        page_type: ['blog','homepage','giris'].includes(input.page_type) ? input.page_type : 'blog',
         created_at: now, updated_at: now
       };
       posts.push(post);

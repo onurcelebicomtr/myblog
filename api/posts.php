@@ -28,6 +28,11 @@ if ($method === 'GET') {
         } else {
             check_auth();
         }
+        // page_type filter
+        $type = $_GET['type'] ?? null;
+        if ($type) {
+            $posts = array_values(array_filter($posts, fn($p) => ($p['page_type'] ?? 'blog') === $type));
+        }
         usort($posts, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
         echo json_encode($posts);
     }
@@ -75,6 +80,7 @@ if ($method === 'POST') {
         'focus_keyword' => sanitize($input['focus_keyword'] ?? ''),
         'canonical' => sanitize($input['canonical'] ?? ''),
         'robots_meta' => sanitize($input['robots_meta'] ?? 'index, follow'),
+        'page_type' => in_array($input['page_type'] ?? '', ['blog', 'homepage', 'giris']) ? $input['page_type'] : 'blog',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
     ];
@@ -118,6 +124,7 @@ if ($method === 'PUT') {
             if (isset($input['focus_keyword'])) $post['focus_keyword'] = sanitize($input['focus_keyword']);
             if (isset($input['canonical'])) $post['canonical'] = sanitize($input['canonical']);
             if (isset($input['robots_meta'])) $post['robots_meta'] = sanitize($input['robots_meta']);
+            if (isset($input['page_type']) && in_array($input['page_type'], ['blog', 'homepage', 'giris'])) $post['page_type'] = $input['page_type'];
             $post['updated_at'] = date('Y-m-d H:i:s');
             break;
         }

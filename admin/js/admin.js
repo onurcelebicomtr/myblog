@@ -93,11 +93,13 @@ function loadPostsList() {
   .then(posts => {
     const tbody = document.getElementById('posts-table');
     if (!posts.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:40px">Henüz yazı yok</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:40px">Henüz yazı yok</td></tr>';
       return;
     }
+    const typeLabels = {blog:'Blog',homepage:'Ana Sayfa',giris:'Giris'};
     tbody.innerHTML = posts.map(p => `<tr>
       <td><strong>${p.title}</strong><br><span style="font-size:12px;color:var(--text-light)">/${p.slug}</span></td>
+      <td><span style="font-size:12px;background:var(--bg);padding:2px 8px;border-radius:10px">${typeLabels[p.page_type] || 'Blog'}</span></td>
       <td>${p.category || '-'}</td>
       <td><span class="status-badge status-${p.status}">${p.status === 'published' ? 'Yayında' : 'Taslak'}</span></td>
       <td style="font-size:13px">${new Date(p.created_at).toLocaleDateString('tr-TR')}</td>
@@ -121,6 +123,7 @@ function clearEditor() {
   document.getElementById('post-image').value = '';
   document.getElementById('post-category').value = '';
   document.getElementById('post-author').value = 'BankoBet';
+  document.getElementById('post-page-type').value = 'blog';
   document.getElementById('post-seo-title').value = '';
   document.getElementById('post-seo-desc').value = '';
   document.getElementById('post-seo-keys').value = '';
@@ -158,6 +161,7 @@ function editPost(id) {
     document.getElementById('post-seo-desc').value = p.seo_description || '';
     document.getElementById('post-seo-keys').value = p.seo_keywords || '';
     document.getElementById('post-author').value = p.author || 'BankoBet';
+    document.getElementById('post-page-type').value = p.page_type || 'blog';
     document.getElementById('post-focus-keyword').value = p.focus_keyword || '';
     document.getElementById('post-canonical').value = p.canonical || '';
     document.getElementById('post-robots').value = p.robots_meta || 'index, follow';
@@ -182,6 +186,7 @@ function savePost(status) {
     excerpt: document.getElementById('post-excerpt').value,
     featured_image: document.getElementById('post-image').value,
     category: document.getElementById('post-category').value,
+    page_type: document.getElementById('post-page-type').value,
     status: status,
     seo_title: document.getElementById('post-seo-title').value,
     seo_description: document.getElementById('post-seo-desc').value,

@@ -82,7 +82,7 @@
         <div class="card">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Başlık</th><th>Kategori</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+              <thead><tr><th>Başlık</th><th>Tip</th><th>Kategori</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
               <tbody id="posts-table"></tbody>
             </table>
           </div>
@@ -153,6 +153,19 @@
               </div>
               <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadImage(this)">
               <input type="hidden" id="post-image">
+            </div>
+
+            <div class="card">
+              <div class="card-title">Sayfa Tipi</div>
+              <div class="form-group">
+                <label>Icerik Turu</label>
+                <select id="post-page-type">
+                  <option value="blog">Blog Yazisi</option>
+                  <option value="homepage">Ana Sayfa Icerigi</option>
+                  <option value="giris">BankoBet Giris Icerigi</option>
+                </select>
+                <p class="form-hint">Ana Sayfa ve Giris sayfasinda sadece 1 icerik gorunur</p>
+              </div>
             </div>
 
             <div class="card">
