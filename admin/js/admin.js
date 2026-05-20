@@ -59,6 +59,8 @@ function showPage(name) {
   if (name === 'dashboard') loadDashboard();
   if (name === 'posts') loadPostsList();
   if (name === 'new-post') clearEditor();
+  if (name === 'home-content') loadPageContent('homepage');
+  if (name === 'giris-content') loadPageContent('giris');
 }
 
 // DASHBOARD
@@ -345,6 +347,143 @@ function saveSeo() {
   fetch(API + 'settings.php', { method: 'PUT', headers: headers(), body: JSON.stringify(data) })
   .then(r => r.json())
   .then(d => { if (d.success) toast('SEO ayarları güncellendi'); });
+}
+
+// PAGE CONTENT (Ana Sayfa / BankoBet Giris)
+function loadPageContent(type) {
+  fetch(API + 'posts.php?all=1', { headers: headers() })
+  .then(r => r.json())
+  .then(posts => {
+    const p = posts.find(x => (x.page_type || 'blog') === type);
+    if (p) {
+      document.getElementById('pc-' + type + '-id').value = p.id;
+      document.getElementById('pc-' + type + '-title').value = p.title || '';
+      document.getElementById('pc-' + type + '-content').innerHTML = p.content || '';
+      document.getElementById('pc-' + type + '-excerpt').value = p.excerpt || '';
+      document.getElementById('pc-' + type + '-image').value = p.featured_image || '';
+      document.getElementById('pc-' + type + '-seo-title').value = p.seo_title || '';
+      document.getElementById('pc-' + type + '-seo-desc').value = p.seo_description || '';
+      document.getElementById('pc-' + type + '-seo-keys').value = p.seo_keywords || '';
+      if (p.featured_image) {
+        document.getElementById('pc-' + type + '-img-wrap').innerHTML = '<img src="../' + p.featured_image + '">';
+        document.getElementById('pc-' + type + '-img-wrap').classList.add('has-img');
+      }
+    } else {
+      document.getElementById('pc-' + type + '-id').value = '';
+      document.getElementById('pc-' + type + '-title').value = '';
+      document.getElementById('pc-' + type + '-content').innerHTML = '';
+      document.getElementById('pc-' + type + '-excerpt').value = '';
+      document.getElementById('pc-' + type + '-image').value = '';
+      document.getElementById('pc-' + type + '-seo-title').value = '';
+      document.getElementById('pc-' + type + '-seo-desc').value = '';
+      document.getElementById('pc-' + type + '-seo-keys').value = '';
+      document.getElementById('pc-' + type + '-img-wrap').innerHTML = '<p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7f8c8d" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gorsel yukle</p>';
+      document.getElementById('pc-' + type + '-img-wrap').classList.remove('has-img');
+    }
+  });
+}
+
+function savePageContent(type) {
+  const id = document.getElementById('pc-' + type + '-id').value;
+  const title = document.getElementById('pc-' + type + '-title').value;
+  if (!title) { toast('Baslik gerekli!', 'error'); return; }
+
+  const data = {
+    title: title,
+    slug: type === 'homepage' ? 'ana-sayfa' : 'bankobet-giris',
+    content: document.getElementById('pc-' + type + '-content').innerHTML,
+    excerpt: document.getElementById('pc-' + type + '-excerpt').value,
+    featured_image: document.getElementById('pc-' + type + '-image').value,
+    page_type: type,
+    status: 'published',
+    heading_tag: 'h1',
+    category: '',
+    seo_title: document.getElementById('pc-' + type + '-seo-title').value,
+    seo_description: document.getElementById('pc-' + type + '-seo-desc').value,
+    seo_keywords: document.getElementById('pc-' + type + '-seo-keys').value,
+    author: 'BankoBet'
+  };
+
+  const method = id ? 'PUT' : 'POST';
+  if (id) data.id = id;
+
+  fetch(API + 'posts.php', { method, headers: headers(), body: JSON.stringify(data) })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      toast(type === 'homepage' ? 'Ana sayfa icerigi kaydedildi!' : 'BankoBet Giris icerigi kaydedildi!');
+      if (d.post && d.post.id) document.getElementById('pc-' + type + '-id').value = d.post.id;
+    } else {
+      toast('Hata olustu', 'error');
+    }
+  });
+}
+
+function uploadPageImage(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  fetch(API + 'upload.php', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: fd
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.url) {
+      document.getElementById('pc-' + type + '-image').value = d.url;
+      document.getElementById('pc-' + type + '-img-wrap').innerHTML = '<img src="../' + d.url + '">';
+      document.getElementById('pc-' + type + '-img-wrap').classList.add('has-img');
+      toast('Gorsel yuklendi');
+    } else {
+      toast(d.error || 'Yukleme hatasi', 'error');
+    }
+  });
+}
+
+// Page content editor commands
+function execCmdPC(type, cmd, val) {
+  document.getElementById('pc-' + type + '-content').focus();
+  document.execCommand(cmd, false, val || null);
+}
+function addHeadingPC(type, tag) {
+  document.getElementById('pc-' + type + '-content').focus();
+  const sel = window.getSelection();
+  if (sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    const el = document.createElement(tag);
+    el.textContent = sel.toString() || 'Baslik';
+    range.deleteContents();
+    range.insertNode(el);
+  }
+}
+function addLinkPC(type) {
+  document.getElementById('pc-' + type + '-content').focus();
+  const url = prompt('Link URL:');
+  if (url) document.execCommand('createLink', false, url);
+}
+function addImagePC(type) {
+  document.getElementById('pc-' + type + '-file').onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    fetch(API + 'upload.php', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.url) {
+        document.getElementById('pc-' + type + '-content').focus();
+        document.execCommand('insertHTML', false, '<img src="../' + d.url + '" style="max-width:100%;border-radius:8px;margin:12px 0">');
+        toast('Gorsel eklendi');
+      }
+    });
+  };
+  document.getElementById('pc-' + type + '-file').click();
 }
 
 // SEO PREVIEW & FOCUS KEYWORD

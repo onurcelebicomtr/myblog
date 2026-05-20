@@ -36,7 +36,9 @@
         <a class="active" onclick="showPage('dashboard')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> <span>Dashboard</span></a>
         <a onclick="showPage('posts')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> <span>Yazilar</span></a>
         <a onclick="showPage('new-post')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span>Yeni Yazi</span></a>
-        <a onclick="showPage('homepage')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> <span>Ana Sayfa</span></a>
+        <a onclick="showPage('home-content')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M7 11l-4 4 4 4"/></svg> <span>Ana Sayfa Icerigi</span></a>
+        <a onclick="showPage('giris-content')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> <span>BankoBet Giris</span></a>
+        <a onclick="showPage('homepage')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> <span>Site Ayarlari</span></a>
         <a onclick="showPage('seo')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> <span>SEO Ayarlari</span></a>
       </nav>
       <div class="logout-btn">
@@ -225,6 +227,138 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ANA SAYFA ICERIGI -->
+      <div class="page" id="page-home-content">
+        <div class="topbar">
+          <h1>Ana Sayfa Icerigi</h1>
+          <button class="btn btn-green" onclick="savePageContent('homepage')">Kaydet ve Yayinla</button>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+          <div>
+            <div class="card">
+              <div class="form-group">
+                <label>Baslik</label>
+                <input type="text" id="pc-homepage-title" placeholder="Ana sayfa icerik basligi">
+              </div>
+              <div class="form-group">
+                <label>Icerik</label>
+                <div class="editor-toolbar">
+                  <button onclick="execCmdPC('homepage','bold')"><b>B</b></button>
+                  <button onclick="execCmdPC('homepage','italic')"><i>I</i></button>
+                  <button onclick="execCmdPC('homepage','underline')"><u>U</u></button>
+                  <button onclick="execCmdPC('homepage','insertUnorderedList')">• Liste</button>
+                  <button onclick="execCmdPC('homepage','insertOrderedList')">1. Liste</button>
+                  <button onclick="addHeadingPC('homepage','h2')">H2</button>
+                  <button onclick="addHeadingPC('homepage','h3')">H3</button>
+                  <button onclick="addLinkPC('homepage')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Link</button>
+                  <button onclick="addImagePC('homepage')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Resim</button>
+                </div>
+                <div class="editor-area" id="pc-homepage-content" contenteditable="true"></div>
+              </div>
+              <div class="form-group">
+                <label>Kisa Ozet</label>
+                <textarea id="pc-homepage-excerpt" rows="2" placeholder="Sayfa ozeti (istege bagli)"></textarea>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">One Cikan Gorsel</div>
+              <div class="img-upload" id="pc-homepage-img-wrap" onclick="document.getElementById('pc-homepage-file').click()">
+                <p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7f8c8d" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gorsel yukle</p>
+              </div>
+              <input type="file" id="pc-homepage-file" accept="image/*" style="display:none" onchange="uploadPageImage(this,'homepage')">
+              <input type="hidden" id="pc-homepage-image">
+            </div>
+            <div class="card">
+              <div class="card-title">SEO</div>
+              <div class="form-group">
+                <label>SEO Baslik</label>
+                <input type="text" id="pc-homepage-seo-title" placeholder="Arama motorlari icin baslik">
+              </div>
+              <div class="form-group">
+                <label>SEO Aciklama</label>
+                <textarea id="pc-homepage-seo-desc" rows="2" placeholder="Arama motorlari icin aciklama"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Anahtar Kelimeler</label>
+                <input type="text" id="pc-homepage-seo-keys" placeholder="virgul ile: bahis, tahmin">
+              </div>
+            </div>
+            <div class="card" style="background:rgba(76,176,80,0.05);border:1px solid rgba(76,176,80,0.2)">
+              <p style="font-size:13px;color:var(--text-light)"><strong style="color:var(--green)">Bilgi:</strong> Bu icerik ana sayfanizda tek basina gorunur. Kaydettiginizde otomatik yayinlanir.</p>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="pc-homepage-id">
+      </div>
+
+      <!-- BANKOBET GIRIS ICERIGI -->
+      <div class="page" id="page-giris-content">
+        <div class="topbar">
+          <h1>BankoBet Giris Icerigi</h1>
+          <button class="btn btn-green" onclick="savePageContent('giris')">Kaydet ve Yayinla</button>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+          <div>
+            <div class="card">
+              <div class="form-group">
+                <label>Baslik</label>
+                <input type="text" id="pc-giris-title" placeholder="BankoBet Giris icerik basligi">
+              </div>
+              <div class="form-group">
+                <label>Icerik</label>
+                <div class="editor-toolbar">
+                  <button onclick="execCmdPC('giris','bold')"><b>B</b></button>
+                  <button onclick="execCmdPC('giris','italic')"><i>I</i></button>
+                  <button onclick="execCmdPC('giris','underline')"><u>U</u></button>
+                  <button onclick="execCmdPC('giris','insertUnorderedList')">• Liste</button>
+                  <button onclick="execCmdPC('giris','insertOrderedList')">1. Liste</button>
+                  <button onclick="addHeadingPC('giris','h2')">H2</button>
+                  <button onclick="addHeadingPC('giris','h3')">H3</button>
+                  <button onclick="addLinkPC('giris')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Link</button>
+                  <button onclick="addImagePC('giris')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Resim</button>
+                </div>
+                <div class="editor-area" id="pc-giris-content" contenteditable="true"></div>
+              </div>
+              <div class="form-group">
+                <label>Kisa Ozet</label>
+                <textarea id="pc-giris-excerpt" rows="2" placeholder="Sayfa ozeti (istege bagli)"></textarea>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">One Cikan Gorsel</div>
+              <div class="img-upload" id="pc-giris-img-wrap" onclick="document.getElementById('pc-giris-file').click()">
+                <p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7f8c8d" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gorsel yukle</p>
+              </div>
+              <input type="file" id="pc-giris-file" accept="image/*" style="display:none" onchange="uploadPageImage(this,'giris')">
+              <input type="hidden" id="pc-giris-image">
+            </div>
+            <div class="card">
+              <div class="card-title">SEO</div>
+              <div class="form-group">
+                <label>SEO Baslik</label>
+                <input type="text" id="pc-giris-seo-title" placeholder="Arama motorlari icin baslik">
+              </div>
+              <div class="form-group">
+                <label>SEO Aciklama</label>
+                <textarea id="pc-giris-seo-desc" rows="2" placeholder="Arama motorlari icin aciklama"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Anahtar Kelimeler</label>
+                <input type="text" id="pc-giris-seo-keys" placeholder="virgul ile: bahis, giris">
+              </div>
+            </div>
+            <div class="card" style="background:rgba(76,176,80,0.05);border:1px solid rgba(76,176,80,0.2)">
+              <p style="font-size:13px;color:var(--text-light)"><strong style="color:var(--green)">Bilgi:</strong> Bu icerik BankoBet Giris sayfasinda tek basina gorunur. Kaydettiginizde otomatik yayinlanir.</p>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="pc-giris-id">
       </div>
 
       <!-- HOMEPAGE SETTINGS -->
