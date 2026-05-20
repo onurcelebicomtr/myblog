@@ -4,6 +4,9 @@ RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Sitemap clean URL
+RewriteRule ^sitemap\.xml$ api/sitemap.php [L]
+
 # Blog post clean URLs
 RewriteRule ^yazilar/([a-z0-9-]+)/?$ post.html?s=$1 [L,QSA]
 

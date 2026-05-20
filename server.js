@@ -88,6 +88,18 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   if (method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
 
+  // Sitemap
+  if (pathname === '/api/sitemap.php' || pathname === '/sitemap.xml') {
+    const posts = readJSON('posts.json').filter(p => p.status === 'published');
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    xml += `  <url><loc>http://localhost:${PORT}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n`;
+    posts.forEach(p => { xml += `  <url><loc>http://localhost:${PORT}/yazilar/${p.slug}</loc><lastmod>${p.updated_at.substring(0,10)}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>\n`; });
+    xml += '</urlset>';
+    res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
+    res.end(xml);
+    return;
+  }
+
   // API Routes
   if (pathname === '/api/auth.php' && method === 'POST') {
     const input = await parseBody(req);
@@ -134,7 +146,10 @@ const server = http.createServer(async (req, res) => {
         featured_image: input.featured_image || '', heading_tag: input.heading_tag || 'h1',
         status: input.status || 'draft', seo_title: input.seo_title || '',
         seo_description: input.seo_description || '', seo_keywords: input.seo_keywords || '',
-        category: input.category || '', created_at: now, updated_at: now
+        category: input.category || '', author: input.author || 'BankoBet',
+        focus_keyword: input.focus_keyword || '', canonical: input.canonical || '',
+        robots_meta: input.robots_meta || 'index, follow',
+        created_at: now, updated_at: now
       };
       posts.push(post);
       writeJSON('posts.json', posts);

@@ -71,6 +71,10 @@ if ($method === 'POST') {
         'seo_description' => sanitize($input['seo_description'] ?? ''),
         'seo_keywords' => sanitize($input['seo_keywords'] ?? ''),
         'category' => sanitize($input['category'] ?? ''),
+        'author' => sanitize($input['author'] ?? 'BankoBet'),
+        'focus_keyword' => sanitize($input['focus_keyword'] ?? ''),
+        'canonical' => sanitize($input['canonical'] ?? ''),
+        'robots_meta' => sanitize($input['robots_meta'] ?? 'index, follow'),
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
     ];
@@ -110,6 +114,10 @@ if ($method === 'PUT') {
             if (isset($input['seo_description'])) $post['seo_description'] = sanitize($input['seo_description']);
             if (isset($input['seo_keywords'])) $post['seo_keywords'] = sanitize($input['seo_keywords']);
             if (isset($input['category'])) $post['category'] = sanitize($input['category']);
+            if (isset($input['author'])) $post['author'] = sanitize($input['author']);
+            if (isset($input['focus_keyword'])) $post['focus_keyword'] = sanitize($input['focus_keyword']);
+            if (isset($input['canonical'])) $post['canonical'] = sanitize($input['canonical']);
+            if (isset($input['robots_meta'])) $post['robots_meta'] = sanitize($input['robots_meta']);
             $post['updated_at'] = date('Y-m-d H:i:s');
             break;
         }

@@ -120,10 +120,21 @@ function clearEditor() {
   document.getElementById('post-excerpt').value = '';
   document.getElementById('post-image').value = '';
   document.getElementById('post-category').value = '';
+  document.getElementById('post-author').value = 'BankoBet';
   document.getElementById('post-seo-title').value = '';
   document.getElementById('post-seo-desc').value = '';
   document.getElementById('post-seo-keys').value = '';
-  document.getElementById('featured-upload').innerHTML = '<p>📷 Görsel yüklemek için tıklayın</p>';
+  document.getElementById('post-focus-keyword').value = '';
+  document.getElementById('post-canonical').value = '';
+  document.getElementById('post-robots').value = 'index, follow';
+  document.getElementById('seo-title-count').textContent = '0';
+  document.getElementById('seo-desc-count').textContent = '0';
+  document.getElementById('focus-kw-hint').textContent = '';
+  document.getElementById('focus-kw-hint').className = 'form-hint';
+  document.getElementById('seo-prev-title').textContent = 'Baslik buraya gelecek - BankoBet';
+  document.getElementById('seo-prev-url').textContent = 'bankobet.com/yazilar/url-slug';
+  document.getElementById('seo-prev-desc').textContent = 'Aciklama buraya gelecek...';
+  document.getElementById('featured-upload').innerHTML = '<p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7f8c8d" stroke-width="2" style="display:inline;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gorsel yuklemek icin tiklayin</p>';
   document.getElementById('featured-upload').classList.remove('has-img');
 }
 
@@ -146,10 +157,18 @@ function editPost(id) {
     document.getElementById('post-seo-title').value = p.seo_title || '';
     document.getElementById('post-seo-desc').value = p.seo_description || '';
     document.getElementById('post-seo-keys').value = p.seo_keywords || '';
+    document.getElementById('post-author').value = p.author || 'BankoBet';
+    document.getElementById('post-focus-keyword').value = p.focus_keyword || '';
+    document.getElementById('post-canonical').value = p.canonical || '';
+    document.getElementById('post-robots').value = p.robots_meta || 'index, follow';
+    document.getElementById('seo-title-count').textContent = (p.seo_title || '').length;
+    document.getElementById('seo-desc-count').textContent = (p.seo_description || '').length;
     if (p.featured_image) {
       document.getElementById('featured-upload').innerHTML = '<img src="../' + p.featured_image + '">';
       document.getElementById('featured-upload').classList.add('has-img');
     }
+    updateSeoPreview();
+    checkFocusKeyword();
   });
 }
 
@@ -166,7 +185,11 @@ function savePost(status) {
     status: status,
     seo_title: document.getElementById('post-seo-title').value,
     seo_description: document.getElementById('post-seo-desc').value,
-    seo_keywords: document.getElementById('post-seo-keys').value
+    seo_keywords: document.getElementById('post-seo-keys').value,
+    author: document.getElementById('post-author').value,
+    focus_keyword: document.getElementById('post-focus-keyword').value,
+    canonical: document.getElementById('post-canonical').value,
+    robots_meta: document.getElementById('post-robots').value
   };
 
   if (!data.title) { toast('Başlık gerekli!', 'error'); return; }
@@ -319,12 +342,44 @@ function saveSeo() {
   .then(d => { if (d.success) toast('SEO ayarları güncellendi'); });
 }
 
+// SEO PREVIEW & FOCUS KEYWORD
+function updateSeoPreview() {
+  const title = document.getElementById('post-seo-title').value || document.getElementById('post-title').value || 'Baslik buraya gelecek';
+  const slug = document.getElementById('post-slug').value || 'url-slug';
+  const desc = document.getElementById('post-seo-desc').value || 'Aciklama buraya gelecek...';
+  document.getElementById('seo-prev-title').textContent = title + ' - BankoBet';
+  document.getElementById('seo-prev-url').textContent = 'bankobet.com/yazilar/' + slug;
+  document.getElementById('seo-prev-desc').textContent = desc;
+  document.getElementById('seo-title-count').textContent = document.getElementById('post-seo-title').value.length;
+  document.getElementById('seo-desc-count').textContent = document.getElementById('post-seo-desc').value.length;
+}
+
+function checkFocusKeyword() {
+  const kw = document.getElementById('post-focus-keyword').value.toLowerCase().trim();
+  const hint = document.getElementById('focus-kw-hint');
+  if (!kw) { hint.textContent = ''; hint.className = 'form-hint'; return; }
+  const title = (document.getElementById('post-seo-title').value || document.getElementById('post-title').value || '').toLowerCase();
+  const desc = (document.getElementById('post-seo-desc').value || '').toLowerCase();
+  const content = (document.getElementById('post-content').innerText || '').toLowerCase();
+  const slug = (document.getElementById('post-slug').value || '').toLowerCase();
+  let score = 0;
+  if (title.includes(kw)) score++;
+  if (desc.includes(kw)) score++;
+  if (content.includes(kw)) score++;
+  if (slug.includes(kw.replace(/\s+/g, '-'))) score++;
+  if (score >= 3) { hint.textContent = 'Harika! Anahtar kelime ' + score + '/4 alanda mevcut'; hint.className = 'form-hint kw-good'; }
+  else if (score >= 2) { hint.textContent = 'Iyi! Anahtar kelime ' + score + '/4 alanda mevcut'; hint.className = 'form-hint kw-warn'; }
+  else { hint.textContent = 'Zayif! Anahtar kelime ' + score + '/4 alanda mevcut'; hint.className = 'form-hint kw-bad'; }
+}
+
 // SEO COUNTERS
 document.getElementById('post-seo-title').addEventListener('input', function() {
   document.getElementById('seo-title-count').textContent = this.value.length;
+  updateSeoPreview();
 });
 document.getElementById('post-seo-desc').addEventListener('input', function() {
   document.getElementById('seo-desc-count').textContent = this.value.length;
+  updateSeoPreview();
 });
 document.getElementById('set-site-desc').addEventListener('input', function() {
   document.getElementById('site-desc-count').textContent = this.value.length;
