@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title id="page-title">BankoBet</title>
+  <meta name="description" id="meta-desc" content="">
+  <meta name="keywords" id="meta-keys" content="">
+  <meta property="og:title" id="og-title" content="">
+  <meta property="og:description" id="og-desc" content="">
+  <meta property="og:image" id="og-image" content="">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="wrap">
+      <a href="/"><img src="uploads/logo.png" alt="BankoBet" class="logo"></a>
+      <nav class="nav">
+        <a href="/">Ana Sayfa</a>
+        <a href="/#blog">Blog</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="post-header">
+    <h1 id="post-title"></h1>
+    <div class="post-meta"><span id="post-date"></span> · <span id="post-cat"></span></div>
+  </div>
+
+  <div class="post-featured" id="post-img-wrap" style="display:none">
+    <img id="post-img" src="" alt="">
+  </div>
+
+  <article class="post-content" id="post-content"></article>
+
+  <footer class="footer" id="footer">
+    <p>© 2025 BankoBet. Tüm hakları saklıdır.</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    const slug = new URLSearchParams(location.search).get('s');
+    if (slug) {
+      fetch('api/posts.php?slug=' + slug)
+        .then(r => r.json())
+        .then(post => {
+          if (post.error) { location.href = '/'; return; }
+          document.getElementById('post-title').textContent = post.title;
+          document.getElementById('post-date').textContent = new Date(post.created_at).toLocaleDateString('tr-TR');
+          document.getElementById('post-cat').textContent = post.category || 'Genel';
+          document.getElementById('post-content').innerHTML = post.content;
+          document.getElementById('page-title').textContent = (post.seo_title || post.title) + ' - BankoBet';
+          document.getElementById('meta-desc').setAttribute('content', post.seo_description || post.excerpt);
+          document.getElementById('meta-keys').setAttribute('content', post.seo_keywords || '');
+          document.getElementById('og-title').setAttribute('content', post.seo_title || post.title);
+          document.getElementById('og-desc').setAttribute('content', post.seo_description || post.excerpt);
+          if (post.featured_image) {
+            document.getElementById('post-img').src = post.featured_image;
+            document.getElementById('post-img-wrap').style.display = 'block';
+            document.getElementById('og-image').setAttribute('content', post.featured_image);
+          }
+        });
+    }
+  </script>
+</body>
+</html>

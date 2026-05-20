@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BankoBet - Yönetim Paneli</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-wrap" id="login">
+    <div class="login-box">
+      <img src="../uploads/logo.png" alt="BankoBet">
+      <h2>Yönetim Paneli</h2>
+      <div class="form-group">
+        <input type="text" id="login-user" placeholder="Kullanıcı adı">
+      </div>
+      <div class="form-group">
+        <input type="password" id="login-pass" placeholder="Şifre">
+      </div>
+      <button class="btn btn-green" style="width:100%" onclick="doLogin()">Giriş Yap</button>
+      <p id="login-err" style="color:#e74c3c;font-size:13px;margin-top:12px"></p>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="app" id="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="../uploads/logo.png" alt="BankoBet">
+      </div>
+      <nav class="sidebar-nav">
+        <a class="active" onclick="showPage('dashboard')">📊 <span>Dashboard</span></a>
+        <a onclick="showPage('posts')">📝 <span>Yazılar</span></a>
+        <a onclick="showPage('new-post')">➕ <span>Yeni Yazı</span></a>
+        <a onclick="showPage('homepage')">🏠 <span>Ana Sayfa</span></a>
+        <a onclick="showPage('seo')">🔍 <span>SEO Ayarları</span></a>
+      </nav>
+      <div class="logout-btn">
+        <a onclick="doLogout()">🚪 <span>Çıkış</span></a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="topbar">
+          <h1>Dashboard</h1>
+          <button class="btn btn-green" onclick="showPage('new-post')">➕ Yeni Yazı</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
+          <div class="card" style="text-align:center">
+            <div style="font-size:32px;font-weight:800;color:var(--green)" id="stat-total">0</div>
+            <div style="font-size:13px;color:var(--text-light)">Toplam Yazı</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:32px;font-weight:800;color:var(--green)" id="stat-published">0</div>
+            <div style="font-size:13px;color:var(--text-light)">Yayında</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:32px;font-weight:800;color:var(--text-light)" id="stat-draft">0</div>
+            <div style="font-size:13px;color:var(--text-light)">Taslak</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Son Yazılar</div>
+          <div id="recent-posts"></div>
+        </div>
+      </div>
+
+      <!-- POSTS LIST -->
+      <div class="page" id="page-posts">
+        <div class="topbar">
+          <h1>Yazılar</h1>
+          <button class="btn btn-green" onclick="showPage('new-post')">➕ Yeni Yazı</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Başlık</th><th>Kategori</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+              <tbody id="posts-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW/EDIT POST -->
+      <div class="page" id="page-new-post">
+        <div class="topbar">
+          <h1 id="editor-title">Yeni Yazı</h1>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" onclick="savePost('draft')">Taslak Kaydet</button>
+            <button class="btn btn-green" onclick="savePost('published')">Yayınla</button>
+          </div>
+        </div>
+
+        <input type="hidden" id="post-id">
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+          <div>
+            <div class="card">
+              <div class="form-group">
+                <label>Yazı Başlığı</label>
+                <input type="text" id="post-title" placeholder="Başlığı yazın..." oninput="autoSlug()">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>URL (Slug)</label>
+                  <input type="text" id="post-slug" placeholder="otomatik-olusturulur">
+                </div>
+                <div class="form-group">
+                  <label>Başlık Etiketi</label>
+                  <select id="post-heading">
+                    <option value="h1">H1</option>
+                    <option value="h2">H2</option>
+                    <option value="h3">H3</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>İçerik</label>
+                <div class="editor-toolbar">
+                  <button onclick="execCmd('bold')" title="Kalın"><b>B</b></button>
+                  <button onclick="execCmd('italic')" title="İtalik"><i>I</i></button>
+                  <button onclick="execCmd('underline')" title="Altı Çizili"><u>U</u></button>
+                  <button onclick="execCmd('insertUnorderedList')" title="Liste">• Liste</button>
+                  <button onclick="execCmd('insertOrderedList')" title="Sıralı Liste">1. Liste</button>
+                  <button onclick="addHeading('h2')" title="Başlık">H2</button>
+                  <button onclick="addHeading('h3')" title="Alt Başlık">H3</button>
+                  <button onclick="addLink()" title="Link">🔗 Link</button>
+                  <button onclick="addImage()" title="Resim">🖼 Resim</button>
+                  <button onclick="execCmd('formatBlock','blockquote')" title="Alıntı">❝ Alıntı</button>
+                </div>
+                <div class="editor-area" id="post-content" contenteditable="true"></div>
+              </div>
+              <div class="form-group">
+                <label>Kısa Özet</label>
+                <textarea id="post-excerpt" rows="2" placeholder="Yazının kısa özeti (isteğe bağlı)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-title">Öne Çıkan Görsel</div>
+              <div class="img-upload" id="featured-upload" onclick="document.getElementById('file-input').click()">
+                <p>📷 Görsel yüklemek için tıklayın</p>
+              </div>
+              <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadImage(this)">
+              <input type="hidden" id="post-image">
+            </div>
+
+            <div class="card">
+              <div class="card-title">Kategori</div>
+              <div class="form-group">
+                <input type="text" id="post-category" placeholder="Örn: Futbol, Basketbol...">
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">SEO Ayarları</div>
+              <div class="form-group">
+                <label>SEO Başlık</label>
+                <input type="text" id="post-seo-title" placeholder="Arama motorlarında görünecek başlık">
+                <p class="form-hint"><span id="seo-title-count">0</span>/60 karakter</p>
+              </div>
+              <div class="form-group">
+                <label>SEO Açıklama</label>
+                <textarea id="post-seo-desc" rows="3" placeholder="Arama motorlarında görünecek açıklama"></textarea>
+                <p class="form-hint"><span id="seo-desc-count">0</span>/160 karakter</p>
+              </div>
+              <div class="form-group">
+                <label>Anahtar Kelimeler</label>
+                <input type="text" id="post-seo-keys" placeholder="virgülle ayırın: bahis, tahmin, analiz">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOMEPAGE SETTINGS -->
+      <div class="page" id="page-homepage">
+        <div class="topbar">
+          <h1>Ana Sayfa Düzenle</h1>
+          <button class="btn btn-green" onclick="saveHomepage()">Kaydet</button>
+        </div>
+        <div class="card">
+          <div class="form-group">
+            <label>Hero Başlık</label>
+            <input type="text" id="set-hero-title" placeholder="Ana sayfa büyük başlık">
+            <p class="form-hint">Virgülden sonrası yeşil renkte görünür</p>
+          </div>
+          <div class="form-group">
+            <label>Hero Açıklama</label>
+            <textarea id="set-hero-desc" rows="2" placeholder="Ana sayfa açıklama yazısı"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Footer Yazısı</label>
+            <input type="text" id="set-footer" placeholder="Alt kısım yazısı">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sosyal Medya</div>
+          <div class="form-group">
+            <label>Twitter / X</label>
+            <input type="text" id="set-twitter" placeholder="https://twitter.com/...">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="text" id="set-instagram" placeholder="https://instagram.com/...">
+          </div>
+          <div class="form-group">
+            <label>Telegram</label>
+            <input type="text" id="set-telegram" placeholder="https://t.me/...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO SETTINGS -->
+      <div class="page" id="page-seo">
+        <div class="topbar">
+          <h1>SEO Ayarları</h1>
+          <button class="btn btn-green" onclick="saveSeo()">Kaydet</button>
+        </div>
+        <div class="card">
+          <div class="form-group">
+            <label>Site Başlığı</label>
+            <input type="text" id="set-site-name" placeholder="BankoBet">
+          </div>
+          <div class="form-group">
+            <label>Site Açıklaması (Meta Description)</label>
+            <textarea id="set-site-desc" rows="3" placeholder="Arama motorlarında görünecek açıklama"></textarea>
+            <p class="form-hint"><span id="site-desc-count">0</span>/160 karakter</p>
+          </div>
+          <div class="form-group">
+            <label>Anahtar Kelimeler (Meta Keywords)</label>
+            <input type="text" id="set-site-keys" placeholder="virgülle ayırın">
+          </div>
+          <div class="form-group">
+            <label>OG Image (Sosyal medya paylaşım görseli)</label>
+            <input type="text" id="set-og-image" placeholder="Görsel URL'si">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
