@@ -8,6 +8,11 @@ if ($method === 'GET') {
     $slug = $_GET['slug'] ?? null;
 
     if ($slug) {
+        if (!validate_slug($slug)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Geçersiz slug']);
+            exit;
+        }
         $post = null;
         foreach ($posts as $p) {
             if ($p['slug'] === $slug && $p['status'] === 'published') {
@@ -20,6 +25,8 @@ if ($method === 'GET') {
         $published_only = !isset($_GET['all']);
         if ($published_only) {
             $posts = array_values(array_filter($posts, fn($p) => $p['status'] === 'published'));
+        } else {
+            check_auth();
         }
         usort($posts, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
         echo json_encode($posts);
@@ -31,21 +38,39 @@ check_auth();
 
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || empty(trim($input['title'] ?? ''))) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Başlık gerekli']);
+        exit;
+    }
+
     $posts = read_json('posts.json');
+    $title = sanitize($input['title']);
+    $post_slug = !empty($input['slug']) ? slug($input['slug']) : slug($title);
+
+    foreach ($posts as $p) {
+        if ($p['slug'] === $post_slug) {
+            $post_slug .= '-' . substr(uniqid(), -4);
+            break;
+        }
+    }
+
+    $status = in_array($input['status'] ?? '', ['draft', 'published']) ? $input['status'] : 'draft';
+    $heading = in_array($input['heading_tag'] ?? '', ['h1', 'h2', 'h3']) ? $input['heading_tag'] : 'h1';
 
     $post = [
-        'id' => uniqid(),
-        'title' => $input['title'] ?? '',
-        'slug' => $input['slug'] ?: slug($input['title'] ?? ''),
-        'content' => $input['content'] ?? '',
-        'excerpt' => $input['excerpt'] ?? '',
-        'featured_image' => $input['featured_image'] ?? '',
-        'heading_tag' => $input['heading_tag'] ?? 'h1',
-        'status' => $input['status'] ?? 'draft',
-        'seo_title' => $input['seo_title'] ?? '',
-        'seo_description' => $input['seo_description'] ?? '',
-        'seo_keywords' => $input['seo_keywords'] ?? '',
-        'category' => $input['category'] ?? '',
+        'id' => bin2hex(random_bytes(8)),
+        'title' => $title,
+        'slug' => $post_slug,
+        'content' => sanitize_html($input['content'] ?? ''),
+        'excerpt' => sanitize($input['excerpt'] ?? ''),
+        'featured_image' => sanitize($input['featured_image'] ?? ''),
+        'heading_tag' => $heading,
+        'status' => $status,
+        'seo_title' => sanitize($input['seo_title'] ?? ''),
+        'seo_description' => sanitize($input['seo_description'] ?? ''),
+        'seo_keywords' => sanitize($input['seo_keywords'] ?? ''),
+        'category' => sanitize($input['category'] ?? ''),
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
     ];
@@ -57,25 +82,43 @@ if ($method === 'POST') {
 
 if ($method === 'PUT') {
     $input = json_decode(file_get_contents('php://input'), true);
-    $posts = read_json('posts.json');
     $id = $input['id'] ?? '';
+
+    if (!$id || !validate_id($id)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Geçersiz ID']);
+        exit;
+    }
+
+    $posts = read_json('posts.json');
+    $found = false;
+
+    $status = in_array($input['status'] ?? '', ['draft', 'published']) ? $input['status'] : null;
+    $heading = in_array($input['heading_tag'] ?? '', ['h1', 'h2', 'h3']) ? $input['heading_tag'] : null;
 
     foreach ($posts as &$post) {
         if ($post['id'] === $id) {
-            $post['title'] = $input['title'] ?? $post['title'];
-            $post['slug'] = $input['slug'] ?: slug($input['title'] ?? $post['title']);
-            $post['content'] = $input['content'] ?? $post['content'];
-            $post['excerpt'] = $input['excerpt'] ?? $post['excerpt'];
-            $post['featured_image'] = $input['featured_image'] ?? $post['featured_image'];
-            $post['heading_tag'] = $input['heading_tag'] ?? $post['heading_tag'];
-            $post['status'] = $input['status'] ?? $post['status'];
-            $post['seo_title'] = $input['seo_title'] ?? $post['seo_title'];
-            $post['seo_description'] = $input['seo_description'] ?? $post['seo_description'];
-            $post['seo_keywords'] = $input['seo_keywords'] ?? $post['seo_keywords'];
-            $post['category'] = $input['category'] ?? $post['category'];
+            $found = true;
+            if (isset($input['title'])) $post['title'] = sanitize($input['title']);
+            $post['slug'] = !empty($input['slug']) ? slug($input['slug']) : slug($post['title']);
+            if (isset($input['content'])) $post['content'] = sanitize_html($input['content']);
+            if (isset($input['excerpt'])) $post['excerpt'] = sanitize($input['excerpt']);
+            if (isset($input['featured_image'])) $post['featured_image'] = sanitize($input['featured_image']);
+            if ($heading) $post['heading_tag'] = $heading;
+            if ($status) $post['status'] = $status;
+            if (isset($input['seo_title'])) $post['seo_title'] = sanitize($input['seo_title']);
+            if (isset($input['seo_description'])) $post['seo_description'] = sanitize($input['seo_description']);
+            if (isset($input['seo_keywords'])) $post['seo_keywords'] = sanitize($input['seo_keywords']);
+            if (isset($input['category'])) $post['category'] = sanitize($input['category']);
             $post['updated_at'] = date('Y-m-d H:i:s');
             break;
         }
+    }
+
+    if (!$found) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Yazı bulunamadı']);
+        exit;
     }
 
     write_json('posts.json', $posts);
@@ -84,10 +127,24 @@ if ($method === 'PUT') {
 
 if ($method === 'DELETE') {
     $input = json_decode(file_get_contents('php://input'), true);
-    $posts = read_json('posts.json');
     $id = $input['id'] ?? '';
 
+    if (!$id || !validate_id($id)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Geçersiz ID']);
+        exit;
+    }
+
+    $posts = read_json('posts.json');
+    $count = count($posts);
     $posts = array_values(array_filter($posts, fn($p) => $p['id'] !== $id));
+
+    if (count($posts) === $count) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Yazı bulunamadı']);
+        exit;
+    }
+
     write_json('posts.json', $posts);
     echo json_encode(['success' => true]);
 }
