@@ -2,3 +2,4 @@ uploads/*
 !uploads/.gitkeep
 data/posts.json
 .DS_Store
+.vercel
